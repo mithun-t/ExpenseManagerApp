@@ -1,11 +1,41 @@
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import { View, StyleSheet } from "react-native";
 import { Card, Title, Paragraph } from "react-native-paper";
+import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
 const DashboardPage = () => {
-  // You would typically fetch this data from your state management solution or API
-  const totalExpenses = 1234.56;
-  const topCategory = "Food";
+  const { expenses, categories } = useContext(CategoriesExpensesContext);
+
+  // Calculate total expenses
+  const totalExpenses = useMemo(() => {
+    return expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  }, [expenses]);
+
+  // Calculate top spending category
+  const categorySpending = useMemo(() => {
+    const spendingByCategory = {};
+
+    expenses.forEach((expense) => {
+      const categoryName = categories.find(
+        (cat) => cat.id === expense.category
+      )?.name;
+
+      if (categoryName) {
+        spendingByCategory[categoryName] =
+          (spendingByCategory[categoryName] || 0) + expense.amount;
+      }
+    });
+
+    const topCategory = Object.keys(spendingByCategory).reduce(
+      (a, b) => (spendingByCategory[a] > spendingByCategory[b] ? a : b),
+      ""
+    );
+
+    return {
+      topCategory,
+      amount: spendingByCategory[topCategory] || 0,
+    };
+  }, [expenses, categories]);
 
   return (
     <View style={styles.container}>
@@ -18,10 +48,12 @@ const DashboardPage = () => {
       <Card style={styles.card}>
         <Card.Content>
           <Title>Top Spending Category</Title>
-          <Paragraph>{topCategory}</Paragraph>
+          <Paragraph>
+            {categorySpending.topCategory} - ₹{" "}
+            {categorySpending.amount.toFixed(2)}
+          </Paragraph>
         </Card.Content>
       </Card>
-      {/* Add more cards or components for additional dashboard info */}
     </View>
   );
 };
