@@ -22,6 +22,7 @@ const ExpenseListToolbar = ({ selected, expenses }) => {
         <View style={styles.actions}>
           <IconButton icon="calculator" size={20} onPress={() => {}} />
           <Text style={styles.totalAmount}>₹ {totalAmount}</Text>
+          <IconButton icon="download" size={20} onPress={() => {}} />
           <IconButton icon="delete" size={20} onPress={() => {}} />
         </View>
       )}

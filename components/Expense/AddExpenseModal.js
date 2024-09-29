@@ -55,12 +55,14 @@ const AddExpenseModal = ({ visible, onDismiss }) => {
           onChangeText={setAmount}
           keyboardType="numeric"
           style={styles.input}
+          mode="outlined"
         />
         <TextInput
           label="Description"
           value={description}
           onChangeText={setDescription}
           style={styles.input}
+          mode="outlined"
         />
         <Button
           onPress={() => setShowDatePicker(true)}

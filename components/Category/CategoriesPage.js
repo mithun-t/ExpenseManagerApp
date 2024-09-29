@@ -1,15 +1,17 @@
 import React, { useContext } from "react";
-import { View, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 import AddCategoryForm from "./AddCategoryForm";
 import CategoryList from "./CategoryList";
 
 const CategoriesPage = () => {
-  const { categories, fetchCategories } = useContext(CategoriesExpensesContext);
+  const { categories, fetchCategoriesAndExpenses } = useContext(
+    CategoriesExpensesContext
+  );
 
   return (
     <ScrollView>
-      <AddCategoryForm fetchCategories={fetchCategories} />
+      <AddCategoryForm fetchCategories={fetchCategoriesAndExpenses} />
       <CategoryList categories={categories} />
     </ScrollView>
   );

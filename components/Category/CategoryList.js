@@ -1,23 +1,25 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { ListItem, Avatar, Icon, Text } from "@rneui/themed";
+import { List, IconButton, useTheme } from "react-native-paper";
 
 const CategoryList = ({ categories, handleDelete }) => {
+  const theme = useTheme();
+
   return (
     <View style={styles.container}>
-      <Text h4>Category List</Text>
       {categories.map((category) => (
-        <ListItem key={category.id} bottomDivider>
-          <Avatar icon={{ name: "attach-money", type: "material" }} />
-          <ListItem.Content>
-            <ListItem.Title>{category.name}</ListItem.Title>
-          </ListItem.Content>
-          <Icon
-            name="delete"
-            type="material"
-            onPress={() => handleDelete(category.id)}
-          />
-        </ListItem>
+        <List.Item
+          key={category.id}
+          title={category.name}
+          left={(props) => <List.Icon {...props} icon="folder" />}
+          right={(props) => (
+            <IconButton
+              {...props}
+              icon="delete"
+              onPress={() => handleDelete(category.id)}
+            />
+          )}
+        />
       ))}
     </View>
   );
@@ -26,6 +28,11 @@ const CategoryList = ({ categories, handleDelete }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
   },
 });
 

@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import {
   Card,
-  Title,
   Paragraph,
   DataTable,
   Menu,
   Button,
+  IconButton,
 } from "react-native-paper";
 import dayjs from "dayjs";
 import ExpenseListToolbar from "./ExpenseListToolbar";
@@ -18,7 +18,8 @@ const ExpenseList = ({ expenses, categories }) => {
   const [selected, setSelected] = useState([]);
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const totalAmount = expenses.reduce(
     (sum, expense) => sum + expense.amount,
@@ -56,20 +57,42 @@ const ExpenseList = ({ expenses, categories }) => {
     );
   };
 
-  // Updated: Handle undefined categories gracefully
+  const toggleSelectAll = () => {
+    if (selected.length === filteredCategoryExpenses.length) {
+      setSelected([]); // Deselect all
+    } else {
+      setSelected(filteredCategoryExpenses.map((expense) => expense.id)); // Select all
+    }
+  };
+
   const selectedCategory = categories.find((c) => c.id === category);
+
+  const handleCategorySelect = (categoryId) => {
+    setCategory(categoryId);
+    setMenuVisible(false);
+    setSelected([]);
+  };
 
   return (
     <Card style={styles.card}>
       <ExpenseListToolbar selected={selected} expenses={expenses} />
       <Card.Content>
+        <IconButton
+          icon={
+            selected.length === filteredCategoryExpenses.length
+              ? "select-inverse"
+              : "select"
+          }
+          size={15}
+          onPress={toggleSelectAll}
+        />
         {/* Category selection dropdown */}
         <Menu
-          visible={!!category}
-          onDismiss={() => setCategory("")}
+          visible={menuVisible}
+          onDismiss={() => setMenuVisible(false)}
           anchor={
             <Button
-              onPress={() => setCategory("temp")}
+              onPress={() => setMenuVisible(true)}
               mode="outlined"
               style={styles.categoryButton}
             >
@@ -77,11 +100,14 @@ const ExpenseList = ({ expenses, categories }) => {
             </Button>
           }
         >
-          <Menu.Item onPress={() => setCategory("")} title="All Categories" />
+          <Menu.Item
+            onPress={() => handleCategorySelect("")}
+            title="All Categories"
+          />
           {categories.map((cat) => (
             <Menu.Item
               key={cat.id}
-              onPress={() => setCategory(cat.id)}
+              onPress={() => handleCategorySelect(cat.id)}
               title={cat.name}
             />
           ))}
@@ -139,6 +165,10 @@ const styles = StyleSheet.create({
   },
   selectedRow: {
     backgroundColor: "#e8f0fe",
+  },
+  selectAllRow: {
+    backgroundColor: "#f0f0f0",
+    cursor: "pointer",
   },
   total: {
     marginTop: 16,
