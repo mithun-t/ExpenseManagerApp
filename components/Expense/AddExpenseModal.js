@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import { Modal, Portal, TextInput, Button, Menu } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StyleSheet } from "react-native";
-import axios from "axios";
 import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
 const AddExpenseModal = ({ visible, onDismiss }) => {
@@ -13,33 +12,31 @@ const AddExpenseModal = ({ visible, onDismiss }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const { categories, isLoadingCategories } = useContext(
-    CategoriesExpensesContext
-  );
+  // Access context
+  const { categories, addExpense } = useContext(CategoriesExpensesContext);
 
   const handleAddExpense = async () => {
     if (!amount || !selectedCategory) return;
 
     const formattedDate = date.toISOString().split("T")[0];
-    try {
-      await axios.post("http://192.168.1.43:8000/api/expenses/", {
-        amount,
-        description,
-        date: formattedDate,
-        category: selectedCategory,
-      });
 
-      // Clear the inputs after adding expense
-      setAmount("");
-      setDescription("");
-      setDate(new Date());
-      setSelectedCategory("");
+    const expenseData = {
+      amount: parseFloat(amount),
+      description,
+      date: formattedDate,
+      category: selectedCategory,
+    };
 
-      // Close the modal
-      onDismiss();
-    } catch (error) {
-      console.error("Error adding expense:", error);
-    }
+    await addExpense(expenseData); // Use the context to add expense and refresh
+
+    // Clear inputs after adding expense
+    setAmount("");
+    setDescription("");
+    setDate(new Date());
+    setSelectedCategory("");
+
+    // Close the modal
+    onDismiss();
   };
 
   const openMenu = () => setMenuVisible(true);
@@ -96,18 +93,16 @@ const AddExpenseModal = ({ visible, onDismiss }) => {
             </Button>
           }
         >
-          {!isLoadingCategories &&
-            categories.length > 0 &&
-            categories.map((category) => (
-              <Menu.Item
-                key={category.id}
-                onPress={() => {
-                  setSelectedCategory(category.id);
-                  closeMenu();
-                }}
-                title={category.name}
-              />
-            ))}
+          {categories.map((category) => (
+            <Menu.Item
+              key={category.id}
+              onPress={() => {
+                setSelectedCategory(category.id);
+                closeMenu();
+              }}
+              title={category.name}
+            />
+          ))}
         </Menu>
 
         <Button

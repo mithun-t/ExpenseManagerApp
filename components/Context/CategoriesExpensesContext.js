@@ -1,44 +1,55 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
 
-// Create the context
+// Create Context
 export const CategoriesExpensesContext = createContext();
 
-// Provider component
+// Create a provider component
 export const CategoriesExpensesProvider = ({ children }) => {
-  const [categories, setCategories] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchCategories();
-    fetchExpenses();
+    fetchCategoriesAndExpenses();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategoriesAndExpenses = async () => {
     try {
-      const response = await axios.get(
-        "http://192.168.1.43:8000/api/categories/"
-      );
-      setCategories(response.data);
+      setIsLoading(true);
+      const [categoriesResponse, expensesResponse] = await Promise.all([
+        axios.get("http://192.168.1.43:8000/api/categories/"),
+        axios.get("http://192.168.1.43:8000/api/expenses/"),
+      ]);
+
+      setCategories(categoriesResponse.data);
+      setExpenses(expensesResponse.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const fetchExpenses = async () => {
+  const addExpense = async (expense) => {
     try {
-      const response = await axios.get(
-        "http://192.168.1.43:8000/api/expenses/"
-      );
-      setExpenses(response.data);
+      await axios.post("http://192.168.1.43:8000/api/expenses/", expense);
+      // After successfully adding an expense, refresh the expense list
+      fetchCategoriesAndExpenses();
     } catch (error) {
-      console.error("Error fetching expenses:", error);
+      console.error("Error adding expense:", error);
     }
   };
 
   return (
     <CategoriesExpensesContext.Provider
-      value={{ categories, expenses, fetchCategories, fetchExpenses }}
+      value={{
+        expenses,
+        categories,
+        isLoading,
+        fetchCategoriesAndExpenses,
+        addExpense,
+      }}
     >
       {children}
     </CategoriesExpensesContext.Provider>
