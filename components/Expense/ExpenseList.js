@@ -9,6 +9,8 @@ import {
   Button,
 } from "react-native-paper";
 import dayjs from "dayjs";
+import ExpenseListToolbar from "./ExpenseListToolbar";
+import ExpenseListHeader from "./ExpenseListHeader";
 
 const ExpenseList = ({ expenses, categories }) => {
   const [order, setOrder] = useState("desc");
@@ -56,8 +58,8 @@ const ExpenseList = ({ expenses, categories }) => {
 
   return (
     <Card style={styles.card}>
+      <ExpenseListToolbar selected={selected} expenses={expenses} />
       <Card.Content>
-        <Title>Expense List</Title>
         <Menu
           visible={!!category}
           onDismiss={() => setCategory("")}
@@ -84,27 +86,11 @@ const ExpenseList = ({ expenses, categories }) => {
         </Menu>
 
         <DataTable>
-          <DataTable.Header>
-            <DataTable.Title
-              sortDirection={orderBy === "date" ? order : "none"}
-              onPress={() => handleSort("date")}
-            >
-              Date
-            </DataTable.Title>
-            <DataTable.Title
-              numeric
-              sortDirection={orderBy === "amount" ? order : "none"}
-              onPress={() => handleSort("amount")}
-            >
-              Amount
-            </DataTable.Title>
-            <DataTable.Title
-              sortDirection={orderBy === "category_name" ? order : "none"}
-              onPress={() => handleSort("category_name")}
-            >
-              Category
-            </DataTable.Title>
-          </DataTable.Header>
+          <ExpenseListHeader
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleSort}
+          />
 
           {paginatedExpenses.map((item) => (
             <DataTable.Row
@@ -116,7 +102,10 @@ const ExpenseList = ({ expenses, categories }) => {
                 {dayjs(item.date).format("MMM D, YYYY")}
               </DataTable.Cell>
               <DataTable.Cell numeric>₹ {item.amount}</DataTable.Cell>
-              <DataTable.Cell>{item.category_name}</DataTable.Cell>
+              <DataTable.Cell>
+                {"     "}
+                {item.category_name}
+              </DataTable.Cell>
             </DataTable.Row>
           ))}
 

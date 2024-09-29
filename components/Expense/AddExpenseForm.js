@@ -20,7 +20,7 @@ const AddExpenseForm = ({ categories, fetchExpenses }) => {
       return;
     }
     const formattedDate = newExpense.date.toISOString().split("T")[0];
-    await axios.post("http://127.0.0.1:8000/api/expenses/", {
+    await axios.post("http://192.168.1.43:8000/api/expenses/", {
       ...newExpense,
       date: formattedDate,
     });
