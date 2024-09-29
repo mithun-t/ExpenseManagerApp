@@ -1,19 +1,49 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { Modal, Portal, TextInput, Button } from "react-native-paper";
+import React, { useState, useContext } from "react";
+import { Modal, Portal, TextInput, Button, Menu } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { StyleSheet } from "react-native";
+import axios from "axios";
+import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
 const AddExpenseModal = ({ visible, onDismiss }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [menuVisible, setMenuVisible] = useState(false);
 
-  const handleAddExpense = () => {
-    // Here you would typically dispatch an action to add the expense
-    console.log("Adding expense:", { amount, description, date });
-    onDismiss();
+  const { categories, isLoadingCategories } = useContext(
+    CategoriesExpensesContext
+  );
+
+  const handleAddExpense = async () => {
+    if (!amount || !selectedCategory) return;
+
+    const formattedDate = date.toISOString().split("T")[0];
+    try {
+      await axios.post("http://192.168.1.43:8000/api/expenses/", {
+        amount,
+        description,
+        date: formattedDate,
+        category: selectedCategory,
+      });
+
+      // Clear the inputs after adding expense
+      setAmount("");
+      setDescription("");
+      setDate(new Date());
+      setSelectedCategory("");
+
+      // Close the modal
+      onDismiss();
+    } catch (error) {
+      console.error("Error adding expense:", error);
+    }
   };
+
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
 
   return (
     <Portal>
@@ -53,6 +83,33 @@ const AddExpenseModal = ({ visible, onDismiss }) => {
             }}
           />
         )}
+
+        {/* Dropdown for Categories */}
+        <Menu
+          visible={menuVisible}
+          onDismiss={closeMenu}
+          anchor={
+            <Button mode="outlined" onPress={openMenu} style={styles.input}>
+              {selectedCategory
+                ? categories.find((c) => c.id === selectedCategory)?.name
+                : "Select Category"}
+            </Button>
+          }
+        >
+          {!isLoadingCategories &&
+            categories.length > 0 &&
+            categories.map((category) => (
+              <Menu.Item
+                key={category.id}
+                onPress={() => {
+                  setSelectedCategory(category.id);
+                  closeMenu();
+                }}
+                title={category.name}
+              />
+            ))}
+        </Menu>
+
         <Button
           mode="contained"
           onPress={handleAddExpense}

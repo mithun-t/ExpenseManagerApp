@@ -1,44 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import axios from "axios";
-import AddExpenseForm from "./AddExpenseForm";
+import React, { useContext } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 import ExpenseList from "./ExpenseList";
+import { Text } from "react-native-paper";
 
 const ExpensesPage = () => {
-  const [expenses, setExpenses] = useState([]);
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    fetchCategories();
-    fetchExpenses();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(
-        "http://192.168.1.43:8000/api/categories/"
-      );
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const fetchExpenses = async () => {
-    try {
-      const response = await axios.get(
-        "http://192.168.1.43:8000/api/expenses/"
-      );
-      setExpenses(response.data);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-    }
-  };
+  const { expenses, categories } = useContext(CategoriesExpensesContext);
 
   return (
     <ScrollView style={styles.container}>
-      <AddExpenseForm categories={categories} fetchExpenses={fetchExpenses} />
-      <ExpenseList expenses={expenses} categories={categories} />
+      {!expenses.length ? (
+        <Text>Loading...</Text>
+      ) : (
+        <ExpenseList expenses={expenses} categories={categories} />
+      )}
     </ScrollView>
   );
 };

@@ -56,10 +56,14 @@ const ExpenseList = ({ expenses, categories }) => {
     );
   };
 
+  // Updated: Handle undefined categories gracefully
+  const selectedCategory = categories.find((c) => c.id === category);
+
   return (
     <Card style={styles.card}>
       <ExpenseListToolbar selected={selected} expenses={expenses} />
       <Card.Content>
+        {/* Category selection dropdown */}
         <Menu
           visible={!!category}
           onDismiss={() => setCategory("")}
@@ -69,9 +73,7 @@ const ExpenseList = ({ expenses, categories }) => {
               mode="outlined"
               style={styles.categoryButton}
             >
-              {category
-                ? categories.find((c) => c.id === category).name
-                : "Select Category"}
+              {selectedCategory ? selectedCategory.name : "Select Category"}
             </Button>
           }
         >
@@ -102,10 +104,7 @@ const ExpenseList = ({ expenses, categories }) => {
                 {dayjs(item.date).format("MMM D, YYYY")}
               </DataTable.Cell>
               <DataTable.Cell numeric>₹ {item.amount}</DataTable.Cell>
-              <DataTable.Cell>
-                {"     "}
-                {item.category_name}
-              </DataTable.Cell>
+              <DataTable.Cell>{item.category_name}</DataTable.Cell>
             </DataTable.Row>
           ))}
 
