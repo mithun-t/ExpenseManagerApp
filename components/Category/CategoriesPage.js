@@ -13,10 +13,10 @@ const CategoriesPage = () => {
   const handleDeleteCategory = async (id) => {
     try {
       await axios.delete(`http://192.168.1.43:8000/api/categories/${id}/`);
-      fetchCategoriesAndExpenses();
     } catch (error) {
       console.error("Error deleting category:", error);
     }
+    fetchCategoriesAndExpenses();
   };
 
   return (

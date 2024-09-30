@@ -24,10 +24,10 @@ const ExpenseListToolbar = ({ selected, expenses, fetchExpenses }) => {
           );
         })
       );
-      fetchExpenses(); // Re-fetch expenses after deletion
     } catch (error) {
       console.error("Error deleting expense:", error);
     }
+    fetchExpenses(); // Re-fetch expenses after deletion
   };
 
   return (

@@ -13,10 +13,10 @@ const AddCategoryForm = ({ fetchCategories }) => {
         name: newCategory,
       });
       setNewCategory("");
-      fetchCategories();
     } catch (error) {
       console.error("Error adding category:", error);
     }
+    fetchCategories();
   };
 
   return (
