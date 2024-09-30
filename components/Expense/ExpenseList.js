@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import { StyleSheet } from "react-native";
 import {
   Card,
@@ -11,8 +11,12 @@ import {
 import dayjs from "dayjs";
 import ExpenseListToolbar from "./ExpenseListToolbar";
 import ExpenseListHeader from "./ExpenseListHeader";
+import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
-const ExpenseList = ({ expenses, categories }) => {
+const ExpenseList = () => {
+  const { expenses, categories, fetchCategoriesAndExpenses } = useContext(
+    CategoriesExpensesContext
+  );
   const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("date");
   const [selected, setSelected] = useState([]);
@@ -75,7 +79,11 @@ const ExpenseList = ({ expenses, categories }) => {
 
   return (
     <Card style={styles.card}>
-      <ExpenseListToolbar selected={selected} expenses={expenses} />
+      <ExpenseListToolbar
+        selected={selected}
+        expenses={expenses}
+        fetchExpenses={fetchCategoriesAndExpenses} // Pass fetchExpenses to refresh list after deletion
+      />
       <Card.Content>
         <IconButton
           icon={
@@ -165,10 +173,6 @@ const styles = StyleSheet.create({
   },
   selectedRow: {
     backgroundColor: "#e8f0fe",
-  },
-  selectAllRow: {
-    backgroundColor: "#f0f0f0",
-    cursor: "pointer",
   },
   total: {
     marginTop: 16,
