@@ -19,9 +19,7 @@ const ExpenseListToolbar = ({ selected, expenses, fetchExpenses }) => {
     try {
       await Promise.all(
         selected.map(async (expenseId) => {
-          await axios.delete(
-            `http://192.168.1.43:8000/api/expenses/${expenseId}/`
-          );
+          await axios.delete(`${API_BASE_URL}/expenses/${expenseId}/`);
         })
       );
     } catch (error) {

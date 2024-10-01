@@ -18,8 +18,8 @@ export const CategoriesExpensesProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const [categoriesResponse, expensesResponse] = await Promise.all([
-        axios.get("http://192.168.1.43:8000/api/categories/"),
-        axios.get("http://192.168.1.43:8000/api/expenses/"),
+        axios.get(`${API_BASE_URL}/categories/`),
+        axios.get(`${API_BASE_URL}/expenses/`),
       ]);
 
       setCategories(categoriesResponse.data);
@@ -33,7 +33,7 @@ export const CategoriesExpensesProvider = ({ children }) => {
 
   const addExpense = async (expense) => {
     try {
-      await axios.post("http://192.168.1.43:8000/api/expenses/", expense);
+      await axios.post(`${API_BASE_URL}/expenses/`, expense);
       // After successfully adding an expense, refresh the expense list
       fetchCategoriesAndExpenses();
     } catch (error) {

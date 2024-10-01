@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { TextInput, Button, Text, useTheme } from "react-native-paper";
 import axios from "axios";
+import API_BASE_URL from "../../apiConfig";
 
 const AddCategoryForm = ({ fetchCategories }) => {
   const [newCategory, setNewCategory] = useState("");
@@ -9,7 +10,7 @@ const AddCategoryForm = ({ fetchCategories }) => {
 
   const handleAddCategory = async () => {
     try {
-      await axios.post("http://192.168.1.43:8000/api/categories/", {
+      await axios.post(`${API_BASE_URL}/categories/`, {
         name: newCategory,
       });
       setNewCategory("");

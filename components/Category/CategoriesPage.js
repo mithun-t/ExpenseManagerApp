@@ -4,6 +4,7 @@ import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext"
 import AddCategoryForm from "./AddCategoryForm";
 import CategoryList from "./CategoryList";
 import axios from "axios";
+import API_BASE_URL from "../../apiConfig";
 
 const CategoriesPage = () => {
   const { categories, fetchCategoriesAndExpenses } = useContext(
@@ -12,7 +13,7 @@ const CategoriesPage = () => {
 
   const handleDeleteCategory = async (id) => {
     try {
-      await axios.delete(`http://192.168.1.43:8000/api/categories/${id}/`);
+      await axios.delete(`${API_BASE_URL}/categories/${id}/`);
     } catch (error) {
       console.error("Error deleting category:", error);
     }
