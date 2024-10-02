@@ -137,7 +137,7 @@ const ExpenseList = () => {
               <DataTable.Cell>
                 {dayjs(item.date).format("MMM D, YYYY")}
               </DataTable.Cell>
-              <DataTable.Cell numeric>₹ {item.amount}</DataTable.Cell>
+              <DataTable.Cell>₹ {item.amount}</DataTable.Cell>
               <DataTable.Cell>{item.category_name}</DataTable.Cell>
             </DataTable.Row>
           ))}

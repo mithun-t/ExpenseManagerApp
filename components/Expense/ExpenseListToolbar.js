@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Appbar, Text, IconButton } from "react-native-paper";
 import axios from "axios";
+import API_BASE_URL from "../../apiConfig";
 
 const ExpenseListToolbar = ({ selected, expenses, fetchExpenses }) => {
   const numSelected = selected.length;

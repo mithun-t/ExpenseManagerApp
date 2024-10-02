@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../apiConfig";
 
 // Create Context
 export const CategoriesExpensesContext = createContext();
