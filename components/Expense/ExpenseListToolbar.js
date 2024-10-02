@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { Appbar, Text, IconButton } from "react-native-paper";
-import axios from "axios";
-import API_BASE_URL from "../../apiConfig";
+import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
-const ExpenseListToolbar = ({ selected, expenses, fetchExpenses }) => {
+const ExpenseListToolbar = ({ selected, expenses }) => {
+  const { deleteExpense } = useContext(CategoriesExpensesContext);
   const numSelected = selected.length;
   const filteredExpenses = expenses.filter((expense) =>
     selected.includes(expense.id)
@@ -15,18 +15,12 @@ const ExpenseListToolbar = ({ selected, expenses, fetchExpenses }) => {
     0
   );
 
-  // Delete handler
   const handleDelete = async () => {
     try {
-      await Promise.all(
-        selected.map(async (expenseId) => {
-          await axios.delete(`${API_BASE_URL}/expenses/${expenseId}/`);
-        })
-      );
+      await Promise.all(selected.map(deleteExpense));
     } catch (error) {
-      console.error("Error deleting expense:", error);
+      console.error("Error deleting expenses:", error);
     }
-    fetchExpenses(); // Re-fetch expenses after deletion
   };
 
   return (
@@ -39,11 +33,7 @@ const ExpenseListToolbar = ({ selected, expenses, fetchExpenses }) => {
           <IconButton icon="calculator" size={20} onPress={() => {}} />
           <Text style={styles.totalAmount}>₹ {totalAmount}</Text>
           <IconButton icon="download" size={20} onPress={() => {}} />
-          <IconButton
-            icon="delete"
-            size={20}
-            onPress={handleDelete} // Trigger the delete function
-          />
+          <IconButton icon="delete" size={20} onPress={handleDelete} />
         </View>
       )}
     </Appbar.Header>

@@ -12,30 +12,25 @@ const AddExpenseModal = ({ visible, onDismiss }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
 
-  // Access context
   const { categories, addExpense } = useContext(CategoriesExpensesContext);
 
   const handleAddExpense = async () => {
     if (!amount || !selectedCategory) return;
 
-    const formattedDate = date.toISOString().split("T")[0];
-
     const expenseData = {
       amount: parseFloat(amount),
       description,
-      date: formattedDate,
+      date: date.toISOString().split("T")[0],
       category: selectedCategory,
     };
 
-    await addExpense(expenseData); // Use the context to add expense and refresh
+    await addExpense(expenseData);
 
-    // Clear inputs after adding expense
     setAmount("");
     setDescription("");
     setDate(new Date());
     setSelectedCategory("");
 
-    // Close the modal
     onDismiss();
   };
 
@@ -83,7 +78,6 @@ const AddExpenseModal = ({ visible, onDismiss }) => {
           />
         )}
 
-        {/* Dropdown for Categories */}
         <Menu
           visible={menuVisible}
           onDismiss={closeMenu}

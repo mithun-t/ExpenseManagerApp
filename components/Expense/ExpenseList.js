@@ -14,9 +14,7 @@ import ExpenseListHeader from "./ExpenseListHeader";
 import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
 const ExpenseList = () => {
-  const { expenses, categories, fetchCategoriesAndExpenses } = useContext(
-    CategoriesExpensesContext
-  );
+  const { expenses, categories } = useContext(CategoriesExpensesContext);
   const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("date");
   const [selected, setSelected] = useState([]);
@@ -63,9 +61,9 @@ const ExpenseList = () => {
 
   const toggleSelectAll = () => {
     if (selected.length === filteredCategoryExpenses.length) {
-      setSelected([]); // Deselect all
+      setSelected([]);
     } else {
-      setSelected(filteredCategoryExpenses.map((expense) => expense.id)); // Select all
+      setSelected(filteredCategoryExpenses.map((expense) => expense.id));
     }
   };
 
@@ -79,11 +77,7 @@ const ExpenseList = () => {
 
   return (
     <Card style={styles.card}>
-      <ExpenseListToolbar
-        selected={selected}
-        expenses={expenses}
-        fetchExpenses={fetchCategoriesAndExpenses} // Pass fetchExpenses to refresh list after deletion
-      />
+      <ExpenseListToolbar selected={selected} expenses={expenses} />
       <Card.Content>
         <IconButton
           icon={
@@ -94,7 +88,6 @@ const ExpenseList = () => {
           size={15}
           onPress={toggleSelectAll}
         />
-        {/* Category selection dropdown */}
         <Menu
           visible={menuVisible}
           onDismiss={() => setMenuVisible(false)}

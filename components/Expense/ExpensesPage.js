@@ -5,17 +5,11 @@ import ExpenseList from "./ExpenseList";
 import { Text } from "react-native-paper";
 
 const ExpensesPage = () => {
-  const { expenses, categories, isLoading } = useContext(
-    CategoriesExpensesContext
-  );
+  const { isLoading } = useContext(CategoriesExpensesContext);
 
   return (
     <ScrollView style={styles.container}>
-      {isLoading ? (
-        <Text>Loading...</Text>
-      ) : (
-        <ExpenseList expenses={expenses} categories={categories} />
-      )}
+      {isLoading ? <Text>Loading...</Text> : <ExpenseList />}
     </ScrollView>
   );
 };

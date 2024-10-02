@@ -1,23 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, StyleSheet } from "react-native";
-import { TextInput, Button, Text, useTheme } from "react-native-paper";
-import axios from "axios";
-import API_BASE_URL from "../../apiConfig";
+import { TextInput, Button, Text } from "react-native-paper";
+import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
 
-const AddCategoryForm = ({ fetchCategories }) => {
+const AddCategoryForm = () => {
   const [newCategory, setNewCategory] = useState("");
-  const theme = useTheme();
+  const { addCategory } = useContext(CategoriesExpensesContext);
 
   const handleAddCategory = async () => {
-    try {
-      await axios.post(`${API_BASE_URL}/categories/`, {
-        name: newCategory,
-      });
+    if (newCategory.trim()) {
+      await addCategory({ name: newCategory.trim() });
       setNewCategory("");
-    } catch (error) {
-      console.error("Error adding category:", error);
     }
-    fetchCategories();
   };
 
   return (

@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import axios from "axios";
-import API_BASE_URL from "../../apiConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Create Context
 export const CategoriesExpensesContext = createContext();
@@ -18,13 +17,11 @@ export const CategoriesExpensesProvider = ({ children }) => {
   const fetchCategoriesAndExpenses = async () => {
     try {
       setIsLoading(true);
-      const [categoriesResponse, expensesResponse] = await Promise.all([
-        axios.get(`${API_BASE_URL}/categories/`),
-        axios.get(`${API_BASE_URL}/expenses/`),
-      ]);
+      const storedCategories = await AsyncStorage.getItem("categories");
+      const storedExpenses = await AsyncStorage.getItem("expenses");
 
-      setCategories(categoriesResponse.data);
-      setExpenses(expensesResponse.data);
+      if (storedCategories) setCategories(JSON.parse(storedCategories));
+      if (storedExpenses) setExpenses(JSON.parse(storedExpenses));
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -34,11 +31,47 @@ export const CategoriesExpensesProvider = ({ children }) => {
 
   const addExpense = async (expense) => {
     try {
-      await axios.post(`${API_BASE_URL}/expenses/`, expense);
-      // After successfully adding an expense, refresh the expense list
-      fetchCategoriesAndExpenses();
+      const newExpenses = [
+        ...expenses,
+        { ...expense, id: Date.now().toString() },
+      ];
+      await AsyncStorage.setItem("expenses", JSON.stringify(newExpenses));
+      setExpenses(newExpenses);
     } catch (error) {
       console.error("Error adding expense:", error);
+    }
+  };
+
+  const addCategory = async (category) => {
+    try {
+      const newCategories = [
+        ...categories,
+        { ...category, id: Date.now().toString() },
+      ];
+      await AsyncStorage.setItem("categories", JSON.stringify(newCategories));
+      setCategories(newCategories);
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
+
+  const deleteExpense = async (id) => {
+    try {
+      const newExpenses = expenses.filter((expense) => expense.id !== id);
+      await AsyncStorage.setItem("expenses", JSON.stringify(newExpenses));
+      setExpenses(newExpenses);
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+    }
+  };
+
+  const deleteCategory = async (id) => {
+    try {
+      const newCategories = categories.filter((category) => category.id !== id);
+      await AsyncStorage.setItem("categories", JSON.stringify(newCategories));
+      setCategories(newCategories);
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
   };
 
@@ -50,6 +83,9 @@ export const CategoriesExpensesProvider = ({ children }) => {
         isLoading,
         fetchCategoriesAndExpenses,
         addExpense,
+        addCategory,
+        deleteExpense,
+        deleteCategory,
       }}
     >
       {children}
