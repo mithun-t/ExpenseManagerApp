@@ -20,7 +20,7 @@ const ExpenseList = () => {
   const [selected, setSelected] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("");
   const [page, setPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [menuVisible, setMenuVisible] = useState(false);
 
   const totalAmount = expenses.reduce(
@@ -82,10 +82,7 @@ const ExpenseList = () => {
 
   return (
     <Card style={styles.card}>
-      <ExpenseListToolbar
-        selected={selected}
-        expenses={expenses}
-      />
+      <ExpenseListToolbar selected={selected} expenses={expenses} />
       <Card.Content>
         <IconButton
           icon={
@@ -138,7 +135,9 @@ const ExpenseList = () => {
               <DataTable.Cell>
                 {dayjs(item.date).format("MMM D, YYYY")}
               </DataTable.Cell>
-              <DataTable.Cell>₹ {parseFloat(item.amount).toFixed(2)}</DataTable.Cell>
+              <DataTable.Cell>
+                ₹ {parseFloat(item.amount).toFixed(2)}
+              </DataTable.Cell>
               <DataTable.Cell>{getCategoryName(item.category)}</DataTable.Cell>
             </DataTable.Row>
           ))}
