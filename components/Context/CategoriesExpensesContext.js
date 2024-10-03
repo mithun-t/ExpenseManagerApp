@@ -19,7 +19,9 @@ export const CategoriesExpensesProvider = ({ children }) => {
       setIsLoading(true);
       const storedCategories = await AsyncStorage.getItem("categories");
       const storedExpenses = await AsyncStorage.getItem("expenses");
-
+      // Log the retrieved categories and expenses to debug
+      console.log("Stored Categories: ", storedCategories);
+      console.log("Stored Expenses: ", storedExpenses);
       if (storedCategories) setCategories(JSON.parse(storedCategories));
       if (storedExpenses) setExpenses(JSON.parse(storedExpenses));
     } catch (error) {

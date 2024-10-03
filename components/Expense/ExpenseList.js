@@ -4,11 +4,11 @@ import {
   Card,
   Paragraph,
   DataTable,
-  Menu,
   Button,
   IconButton,
 } from "react-native-paper";
 import dayjs from "dayjs";
+import MultiSelect from "react-native-multiple-select";
 import ExpenseListToolbar from "./ExpenseListToolbar";
 import ExpenseListHeader from "./ExpenseListHeader";
 import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
@@ -18,20 +18,22 @@ const ExpenseList = () => {
   const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("date");
   const [selected, setSelected] = useState([]);
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState([]);
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [menuVisible, setMenuVisible] = useState(false);
 
+  // Calculate the total amount of expenses
   const totalAmount = expenses.reduce(
     (sum, expense) => sum + parseFloat(expense.amount),
     0
   );
 
-  const filteredCategoryExpenses = categoryFilter
-    ? expenses.filter((expense) => expense.category === categoryFilter)
+  // Filter expenses based on selected categories
+  const filteredCategoryExpenses = categoryFilter.length
+    ? expenses.filter((expense) => categoryFilter.includes(expense.category))
     : expenses;
 
+  // Sort the filtered expenses
   const sortedExpenses = useMemo(() => {
     return [...filteredCategoryExpenses].sort((a, b) => {
       if (order === "asc") {
@@ -42,23 +44,27 @@ const ExpenseList = () => {
     });
   }, [filteredCategoryExpenses, order, orderBy]);
 
+  // Paginate sorted expenses
   const paginatedExpenses = sortedExpenses.slice(
     page * itemsPerPage,
     (page + 1) * itemsPerPage
   );
 
+  // Handle sorting of expenses
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
+  // Toggle selection of expenses
   const toggleSelection = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
   };
 
+  // Toggle selection of all expenses
   const toggleSelectAll = () => {
     if (selected.length === filteredCategoryExpenses.length) {
       setSelected([]);
@@ -67,14 +73,7 @@ const ExpenseList = () => {
     }
   };
 
-  const selectedCategory = categories.find((c) => c.id === categoryFilter);
-
-  const handleCategorySelect = (categoryId) => {
-    setCategoryFilter(categoryId);
-    setMenuVisible(false);
-    setSelected([]);
-  };
-
+  // Fetch category name based on ID
   const getCategoryName = (categoryId) => {
     const category = categories.find((c) => c.id === categoryId);
     return category ? category.name : "Uncategorized";
@@ -93,31 +92,27 @@ const ExpenseList = () => {
           size={15}
           onPress={toggleSelectAll}
         />
-        <Menu
-          visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          anchor={
-            <Button
-              onPress={() => setMenuVisible(true)}
-              mode="outlined"
-              style={styles.categoryButton}
-            >
-              {selectedCategory ? selectedCategory.name : "Select Category"}
-            </Button>
-          }
-        >
-          <Menu.Item
-            onPress={() => handleCategorySelect("")}
-            title="All Categories"
-          />
-          {categories.map((cat) => (
-            <Menu.Item
-              key={cat.id}
-              onPress={() => handleCategorySelect(cat.id)}
-              title={cat.name}
-            />
-          ))}
-        </Menu>
+
+        {/* Multi-select Dropdown for Category Filtering */}
+        <MultiSelect
+          items={categories.map((cat) => ({ id: cat.id, name: cat.name }))}
+          uniqueKey="id"
+          onSelectedItemsChange={setCategoryFilter}
+          selectedItems={categoryFilter}
+          selectText="Select Categories"
+          searchInputPlaceholderText="Search Categories..."
+          tagRemoveIconColor="#CCC"
+          tagBorderColor="#CCC"
+          tagTextColor="#CCC"
+          selectedItemTextColor="#CCC"
+          selectedItemIconColor="#CCC"
+          itemTextColor="#000"
+          displayKey="name"
+          searchInputStyle={{ color: "#CCC" }}
+          submitButtonColor="#48d22b"
+          submitButtonText="Apply"
+          styleDropdownMenuSubsection={styles.multiSelect}
+        />
 
         <DataTable>
           <ExpenseListHeader
@@ -126,6 +121,7 @@ const ExpenseList = () => {
             onRequestSort={handleSort}
           />
 
+          {/* Display the paginated expenses */}
           {paginatedExpenses.map((item) => (
             <DataTable.Row
               key={item.id}
@@ -142,6 +138,7 @@ const ExpenseList = () => {
             </DataTable.Row>
           ))}
 
+          {/* Pagination controls */}
           <DataTable.Pagination
             page={page}
             numberOfPages={Math.ceil(sortedExpenses.length / itemsPerPage)}
@@ -156,6 +153,7 @@ const ExpenseList = () => {
           />
         </DataTable>
 
+        {/* Total amount display */}
         <Paragraph style={styles.total}>
           Total Expense: ₹ {totalAmount.toFixed(2)}
         </Paragraph>
@@ -168,8 +166,10 @@ const styles = StyleSheet.create({
   card: {
     margin: 16,
   },
-  categoryButton: {
+  multiSelect: {
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   selectedRow: {
     backgroundColor: "#e8f0fe",
