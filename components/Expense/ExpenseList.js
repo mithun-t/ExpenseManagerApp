@@ -12,6 +12,7 @@ import MultiSelect from "react-native-multiple-select";
 import ExpenseListToolbar from "./ExpenseListToolbar";
 import ExpenseListHeader from "./ExpenseListHeader";
 import { CategoriesExpensesContext } from "../Context/CategoriesExpensesContext";
+import { DatePickerModal } from "react-native-paper-dates"; // Import DatePickerModal
 
 const ExpenseList = () => {
   const { expenses, categories } = useContext(CategoriesExpensesContext);
@@ -21,6 +22,10 @@ const ExpenseList = () => {
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [startDateVisible, setStartDateVisible] = useState(false); // Add state for start date visibility
+  const [endDateVisible, setEndDateVisible] = useState(false); // Add state for end date visibility
 
   // Calculate the total amount of expenses
   const totalAmount = expenses.reduce(
@@ -30,8 +35,21 @@ const ExpenseList = () => {
 
   // Filter expenses based on selected categories
   const filteredCategoryExpenses = categoryFilter.length
-    ? expenses.filter((expense) => categoryFilter.includes(expense.category))
-    : expenses;
+    ? expenses.filter(
+        (expense) =>
+          categoryFilter.includes(expense.category) &&
+          (!startDate ||
+            dayjs(expense.date).isAfter(dayjs(startDate).startOf("day"))) &&
+          (!endDate ||
+            dayjs(expense.date).isBefore(dayjs(endDate).endOf("day")))
+      )
+    : expenses.filter(
+        (expense) =>
+          (!startDate ||
+            dayjs(expense.date).isAfter(dayjs(startDate).startOf("day"))) &&
+          (!endDate ||
+            dayjs(expense.date).isBefore(dayjs(endDate).endOf("day")))
+      );
 
   // Sort the filtered expenses
   const sortedExpenses = useMemo(() => {
@@ -83,14 +101,33 @@ const ExpenseList = () => {
     <Card style={styles.card}>
       <ExpenseListToolbar selected={selected} expenses={expenses} />
       <Card.Content>
-        <IconButton
-          icon={
-            selected.length === filteredCategoryExpenses.length
-              ? "select-inverse"
-              : "select"
-          }
-          size={15}
-          onPress={toggleSelectAll}
+        {/* Date Range Filter */}
+        <Button onPress={() => setStartDateVisible(true)}>
+          Select Start Date
+        </Button>
+        <Button onPress={() => setEndDateVisible(true)}>Select End Date</Button>
+
+        <DatePickerModal
+          locale="en"
+          mode="single"
+          visible={startDateVisible}
+          onDismiss={() => setStartDateVisible(false)}
+          date={startDate}
+          onConfirm={(params) => {
+            setStartDate(params.date);
+            setStartDateVisible(false);
+          }}
+        />
+        <DatePickerModal
+          locale="en"
+          mode="single"
+          visible={endDateVisible}
+          onDismiss={() => setEndDateVisible(false)}
+          date={endDate}
+          onConfirm={(params) => {
+            setEndDate(params.date);
+            setEndDateVisible(false);
+          }}
         />
 
         {/* Multi-select Dropdown for Category Filtering */}
@@ -113,7 +150,15 @@ const ExpenseList = () => {
           submitButtonText="Apply"
           styleDropdownMenuSubsection={styles.multiSelect}
         />
-
+        <IconButton
+          icon={
+            selected.length === filteredCategoryExpenses.length
+              ? "select-inverse"
+              : "select"
+          }
+          size={15}
+          onPress={toggleSelectAll}
+        />
         <DataTable>
           <ExpenseListHeader
             order={order}
