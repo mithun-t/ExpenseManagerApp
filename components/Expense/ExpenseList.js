@@ -18,18 +18,18 @@ const ExpenseList = () => {
   const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("date");
   const [selected, setSelected] = useState([]);
-  const [category, setCategory] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [menuVisible, setMenuVisible] = useState(false);
 
   const totalAmount = expenses.reduce(
-    (sum, expense) => sum + expense.amount,
+    (sum, expense) => sum + parseFloat(expense.amount),
     0
   );
 
-  const filteredCategoryExpenses = category
-    ? expenses.filter((expense) => expense.category === category)
+  const filteredCategoryExpenses = categoryFilter
+    ? expenses.filter((expense) => expense.category === categoryFilter)
     : expenses;
 
   const sortedExpenses = useMemo(() => {
@@ -67,17 +67,25 @@ const ExpenseList = () => {
     }
   };
 
-  const selectedCategory = categories.find((c) => c.id === category);
+  const selectedCategory = categories.find((c) => c.id === categoryFilter);
 
   const handleCategorySelect = (categoryId) => {
-    setCategory(categoryId);
+    setCategoryFilter(categoryId);
     setMenuVisible(false);
     setSelected([]);
   };
 
+  const getCategoryName = (categoryId) => {
+    const category = categories.find((c) => c.id === categoryId);
+    return category ? category.name : "Uncategorized";
+  };
+
   return (
     <Card style={styles.card}>
-      <ExpenseListToolbar selected={selected} expenses={expenses} />
+      <ExpenseListToolbar
+        selected={selected}
+        expenses={expenses}
+      />
       <Card.Content>
         <IconButton
           icon={
@@ -130,8 +138,8 @@ const ExpenseList = () => {
               <DataTable.Cell>
                 {dayjs(item.date).format("MMM D, YYYY")}
               </DataTable.Cell>
-              <DataTable.Cell>₹ {item.amount}</DataTable.Cell>
-              <DataTable.Cell>{item.category_name}</DataTable.Cell>
+              <DataTable.Cell>₹ {parseFloat(item.amount).toFixed(2)}</DataTable.Cell>
+              <DataTable.Cell>{getCategoryName(item.category)}</DataTable.Cell>
             </DataTable.Row>
           ))}
 
@@ -150,7 +158,7 @@ const ExpenseList = () => {
         </DataTable>
 
         <Paragraph style={styles.total}>
-          Total Expense: ₹ {totalAmount}
+          Total Expense: ₹ {totalAmount.toFixed(2)}
         </Paragraph>
       </Card.Content>
     </Card>
